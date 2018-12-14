@@ -1,6 +1,11 @@
 [Unit]
 Description=Named network namespace %I
 Documentation=https://github.com/Jamesits/systemd-named-netns
+# PartOf declarations stop this (netns@%i.service) when any of these services is stopped.
+# PartOf declarations does not cause starting this service to start any of those services
+PartOf=netns-tunnel@%i.service
+PartOf=netns-nat@%i.service
+PartOf=netns-bridge@%i.service
 
 After=network-pre.target
 Before=network.target network-online.target
