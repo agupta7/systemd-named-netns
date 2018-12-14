@@ -17,6 +17,7 @@ autoconfigure_tunnel() {
 		dhclient -v -i ${DEVNAME_INSIDE} -nw -pf /var/run/netns/dhclient-${NSNAME}.pid
 	else
 		if [ ! -z "${IPADDR}" ]; then
+			echo exec: /bin/ip address add ${IPADDR} dev ${DEVNAME_INSIDE}
 			/bin/ip address add ${IPADDR} dev ${DEVNAME_INSIDE}
 		fi
 		if [ ! -z "${GATEWAY}" ]; then
@@ -40,12 +41,32 @@ autoconfigure() {
 
 	echo "Starting autoconfigure for $NSTYPE ${NSNAME}"
 	DEVNAME_INSIDE=vn-${NSNAME}1
-	source /etc/default/netns
-	! source "/etc/default/netns-${NSNAME}"
+
+	if [ -e /etc/netns/netns-global.conf ]; then
+		echo sourcing global config
+		source /etc/netns/netns-global.conf
+		echo sourced global config
+	else
+		echo "global config file /etc/netns/netns-global.conf does not exist!"
+	fi
+	if [ -e "/etc/netns/${NSNAME}/netns.conf" ]; then
+		echo sourcing local config
+		source "/etc/netns/${NSNAME}/netns.conf"
+		echo sourced local config
+	fi
 
 	if type -t autoconfigure_$NSTYPE >/dev/null ; then
 		autoconfigure_$NSTYPE "$@"
 	fi
+
+	set +e
+	if [ ! -z "${POSTCONFIGURE}" ]; then
+		eval "${POSTCONFIGURE}"
+		if [ $? == 0 ]; then
+			echo "The post configure script variable eval resulted in exit code $?."
+		fi
+	fi
+	set -e
 
 	echo "Autoconfiguration finished."
 }

@@ -15,8 +15,8 @@ Type=oneshot
 RemainAfterExit=yes
 Environment=DEVNAME_OUTSIDE=vn-%I0
 Environment=DEVNAME_INSIDE=vn-%I1
-EnvironmentFile=/etc/default/netns
-EnvironmentFile=-/etc/default/netns-%I
+EnvironmentFile=/etc/netns/netns-global.conf
+EnvironmentFile=-/etc/netns/%I/netns.conf
 
 ExecStartPre=-/usr/bin/env ip link delete ${DEVNAME_OUTSIDE}
 ExecStartPre=-/usr/bin/env ip link delete ${DEVNAME_INSIDE}

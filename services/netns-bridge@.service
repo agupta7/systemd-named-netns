@@ -16,8 +16,8 @@ Type=oneshot
 RemainAfterExit=yes
 Environment=DEVNAME_OUTSIDE=vn-%I0
 Environment=DEVNAME_INSIDE=vn-%I1
-EnvironmentFile=/etc/default/netns
-EnvironmentFile=-/etc/default/netns-%I
+EnvironmentFile=/etc/netns/netns-global.conf
+EnvironmentFile=-/etc/netns-%I/netns.conf
 
 ExecStart=/usr/bin/env ip link set ${DEVNAME_OUTSIDE} master ${BRIDGE}
 
